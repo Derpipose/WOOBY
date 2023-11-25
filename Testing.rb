@@ -3,7 +3,7 @@ require 'glimmer-dsl-libui'
 
 include Glimmer
 
-class Bird 
+class Bird
     attr_reader :positionx, :positiony
     size = 25
     color = {r: 210, g: 210, b:210}
@@ -52,8 +52,8 @@ class Player
 
 end
 
-class Board 
-    Chunks = [[]]
+class Board
+    Chunks = []
     def initialize(layout)
         @Chunks = layout
     end
