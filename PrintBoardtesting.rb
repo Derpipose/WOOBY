@@ -15,7 +15,8 @@ class ChaseTheBird
   end
 
   def launch(board)
-    create_gui(board)
+    @game = board
+    create_gui(@game)
     @main_window.show
   end
 
@@ -26,7 +27,6 @@ class ChaseTheBird
 
       vertical_box {
         padded false
-
         board.layout.each_with_index do |row, x|
           horizontal_box {
             padded false
@@ -60,29 +60,24 @@ class ChaseTheBird
       on_key_down do |key_event|
         case key_event
         in ext_key: :down
-          
-        in key: ' '
-          @game.down!(instant: true)
+          @game.movep('down')
+          puts 'moving down'
         in ext_key: :up
-          case @game.up_arrow_action
-          when :instant_down
-            @game.down!(instant: true)
-          when :rotate_right
-            @game.rotate!(:right)
-          when :rotate_left
-            @game.rotate!(:left)
-          end
+          @game.movep('up')
+          puts 'moving up'
         in ext_key: :left
-          @game.left!
+          @game.movep('left')
+          puts 'moving left'
         in ext_key: :right
-          @game.right!
-        in modifier: :shift
-          @game.rotate!(:right)
-        in modifier: :control
-          @game.rotate!(:left)
+          @game.movep('right')
+          puts 'moving right'
         else
           # Do Nothing
         end
+        create_gui(@game)
+        puts 'updated game'
+        puts @game.player.positioncol
+        puts @game.player.positionrow
       end
     }
   end
