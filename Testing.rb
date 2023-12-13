@@ -16,12 +16,14 @@ class Bird
     def checkUp
         checkrow = @positionrow
         checkcol = @positioncol
-        while @board[checkrow][checkcol] == '0'  do
-            if @board[checkrow -1][checkcol-1] == '0' || @board[checkrow-1][checkcol +1] == '0'
+        if@board[checkrow+1][checkcol] == '0'
+          while @board[checkrow][checkcol] == '0'  do
+              if @board[checkrow -1][checkcol-1] == '0' || @board[checkrow-1][checkcol +1] == '0'
 
-                return  true
-            end
-            checkrow -=1
+                  return  true
+              end
+              checkrow -=1
+          end
         end
         return false
     end
@@ -29,24 +31,29 @@ class Bird
     def checkDown
         checkrow = @positionrow
         checkcol = @positioncol
-        while @board[checkrow][checkcol] == '0' do
-            if @board[checkrow +1][checkcol-1] == '0' || @board[checkrow+1][checkcol +1] == '0'
-                movedown = true
-                movecomplete = true
-            end
-            checkrow +=1
+        if@board[checkrow+1][checkcol] == '0'
+          while @board[checkrow][checkcol] == '0' do
+              if @board[checkrow +1][checkcol-1] == '0' || @board[checkrow+1][checkcol +1] == '0'
+                  movedown = true
+                  movecomplete = true
+              end
+              checkrow +=1
+          end
         end
+        return false
     end
 
     def checkLeft
         checkrow = @positionrow
         checkcol = @positioncol
-        while @board[checkrow][checkcol] == '0' do
-            if @board[checkrow-1][checkcol -1] == '0' || @board[checkrow+1][checkcol -1] == '0'
+        if@board[checkrow][checkcol-1] == '0'
+          while @board[checkrow][checkcol] == '0' do
+              if @board[checkrow-1][checkcol -1] == '0' || @board[checkrow+1][checkcol -1] == '0'
 
-                return true
-            end
-            checkcol -=1
+                  return true
+              end
+              checkcol -=1
+          end
         end
         return false
     end
@@ -54,11 +61,13 @@ class Bird
     def checkRight
         checkrow = @positionrow
         checkcol = @positioncol
-        while @board[checkrow][checkcol] == '0' do
-            if @board[checkrow-1][checkcol +1] == '0' || @board[checkrow+1][checkcol +1] == '0'
-                return true
-            end
-            checkcol +=1
+        if@board[checkrow][checkcol+1] == '0'
+          while @board[checkrow][checkcol] == '0' do
+              if @board[checkrow-1][checkcol +1] == '0' || @board[checkrow+1][checkcol +1] == '0'
+                  return true
+              end
+              checkcol +=1
+          end
         end
         return false
     end
@@ -66,9 +75,7 @@ class Bird
 
     ##TODO COMPLETE BIRD RESPONSE
     def movecheck(row, col)
-        if row == @positionrow && col == positioncol
-            @caught = true;
-        end
+        checkCaught(row, col)
         #player approaching from left
         if row == positionrow && col < positioncol && ( positioncol - col <=2 )
             movecomplete = false
@@ -121,8 +128,8 @@ class Bird
             end
             #last ditch moving check
             if movecomplete == false
-                if @board[@positionrow + 1][@positioncol] == '0'
-                    @positionrow += 1;
+                if @board[@positionrow - 1][@positioncol] == '0'
+                    @positionrow -= 1;
                 elsif @board[@positionrow][@positioncol-1] == '0'
                     @positioncol -=1;
                 elsif @board[@positionrow][@positioncol+1] == '0'
@@ -194,13 +201,14 @@ class Bird
     end
 
 
-    def checkCaught(player)
-        if player.positioncol ==positioncol && player.positionrow == positionrow
-                @caught = true
+    def checkCaught(row,col)
+        if col ==positioncol && row == positionrow
+          @caught = true
+          puts "You caught the bird!"
         end
     end
 
-end
+  end
 
 class Player
     attr_reader :positionrow, :positioncol
@@ -247,6 +255,22 @@ class Board
             @player.move('right')
             @bird.movecheck(@player.positionrow, @player.positioncol)
       end
+  end
+
+  def printBoard
+        @layout.each_with_index do |row, x|
+            printrow = ''
+            row.each_with_index do |cell, y|
+                if x == @player.positionrow && y == @player.positioncol
+                    printrow += 'B'
+                elsif x == @bird.positionrow && y == @bird.positioncol
+                    printrow += 'V'
+                else
+                    printrow += @layout[x][y]
+                end
+            end
+            puts printrow
+        end
   end
 end
 
@@ -495,5 +519,26 @@ class BoardTesting < Minitest::Test
         game.movep('down')
         assert_equal(4, bird.positionrow)
         assert_equal(3, bird.positioncol)
+    end
+end
+
+class PrintBoardTesting < Minitest::Test
+    def test_printing_board
+        boardtest = [
+            ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x', 'x', '0', 'x', '0', 'x', 'x'],
+            ['x', 'x', 'x', 'x', '0', '0', '0', '0', '0', 'x'],
+            ['x', 'x', 'x', 'x', 'x', 'x', 'x', '0', 'x', 'x'],
+            ['x', '0', '0', '0', '0', '0', '0', '0', '0', 'x'],
+            ['x', 'x', 'x', '0', 'x', 'x', 'x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', '0', 'x', 'x', 'x', 'x', 'x', 'x'],
+            ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x']
+        ]
+        player = Player.new(6,1,boardtest)
+        bird = Bird.new(6,7, boardtest)
+        game = Board.new(boardtest, player, bird)
+        game.printBoard
     end
 end
